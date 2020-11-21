@@ -5,7 +5,7 @@ import telebot
 import time
 #pip3 install pytelegrambotapi --upgrade
 
-bot = telebot.TeleBot('xxxxxxxxx:yyyyyyyyyyyyyyyyyyyy')
+bot = telebot.TeleBot('1455219084:AAHQJ345bCjyZNJXoTbbZhsjVGbr5tmTBns')
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
