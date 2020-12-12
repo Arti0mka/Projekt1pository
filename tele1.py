@@ -7,7 +7,7 @@ import time
 
 
 
-bot = telebot.TeleBot('1269788895:AAG3pFUfu4MIFr86iDI9K6xQAKbn1ozJ914')
+bot = telebot.TeleBot('1287725214:AAEPpUk4MmCQOl5FDBs5IiF3zzNRQXHnB6Q')
 
 board = list(range(1,10))
 
