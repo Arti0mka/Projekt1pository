@@ -3,97 +3,48 @@ import sys
 import subprocess
 import telebot
 import time
+from telebot import types
+import ast
 #pip3 install pytelegrambotapi --upgrade
 
+oButtonConfig = {"one": "key_one", "two": "key_two", "three": "key_three"}
 
+def makeKeyboard(oArr):
+    markup = types.InlineKeyboardMarkup()
+    for value,key in oArr.items():
+        markup.add(types.InlineKeyboardButton(text=value,
+                 callback_data="['value', '" + value + "', '" + key + "']"))
+    return markup
 
 bot = telebot.TeleBot('1287725214:AAEPpUk4MmCQOl5FDBs5IiF3zzNRQXHnB6Q')
 
-board = list(range(1,10))
 
-def draw_board(bot,message,board):
-    bot.send_message(message.from_user.id, "-" * 13)
-    for i in range(3):
-        bot.send_message(message.from_user.id,"|"+ str(board[0+i*3])+ "|"+ str(board[1+i*3])+ "|"+ str(board[2+i*3])+ "|")
-        bot.send_message(message.from_user.id, "-" * 13)   
-def take_input(bot,message,player_token):
-    valid = False
-    while not valid:
-        valid = True
-        #bot.send_message(message.from_user.id,"Куда поставим " + player_token+"? ")
-        player_answer = message.text
-        try:
-            player_answer = int(player_answer)
-        except:
-            bot.send_message(message.from_user.id,"Некорректный ввод. Вы уверены, что ввели число?")
-            continue
-        if player_answer >= 1 and player_answer <= 9:
-            if (str(board[player_answer-1]) not in "XO"):
-                board[player_answer-1] = player_token
-                valid = True
-            else:
-                bot.send_message(message.from_user.id,"Эта клеточка уже занята")
-        else:
-            bot.send_message(message.from_user.id,"Некорректный ввод. Введите число от 1 до 9 чтобы походить.")
+@bot.callback_query_handler(func=lambda call: True)
+def handle_query(call):
+    if (call.data.startswith("['value'")):
+        valueFromCallBack = ast.literal_eval(call.data)[1]
+        messTXT = ast.literal_eval(call.data)[2]
+    if messTXT == "key_one":
+        bot.send_message(chat_id=call.message.chat.id,text="you send one button")
+    elif messTXT == "key_two":
+        bot.send_message(chat_id=call.message.chat.id,text="you send two button")
+    elif messTXT == "key_three":
+        bot.send_message(chat_id=call.message.chat.id,text="you send three button")
+    else:
+        bot.send_message(chat_id=call.message.chat.id,text="write artem for create new keyboard")
 
-
-def check_win(board):
-    win_coord = ((0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6))
-    for each in win_coord:
-        if board[each[0]] == board[each[1]] == board[each[2]]:
-            return board[each[0]]
-    return False
-
-
-stateGame = 0
-# 0 no game
-# 1 start game and write board
-# 2 insert data to board
-countGame = 0
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    global stateGame
-    global countGame
-    print(stateGame)
-    print(countGame)
+    print(message.text)
     if message.text == "/help":
-        bot.send_message(message.from_user.id, "hello my dear  hoziain im a you slav")
-    elif stateGame == 0 and message.text == "gogo":
-        stateGame = 1
-        countGame = 0
-        draw_board(bot,message,board)
-    elif stateGame >= 1 and message.text.isdigit():
-        stateGame = 2
-        if countGame % 2 == 0:
-            take_input(bot,message,"X")
-        else:
-            take_input(bot,message,"O")        
-        countGame += 1
-        if countGame > 4:
-            tmp = check_win(board)
-            if tmp:
-                bot.send_message(message.from_user.id, tmp)
-                bot.send_message(message.from_user.id, "выиграл!")
-                win = True
-                stateGame = 0
-        if countGame == 9:
-            bot.send_message(message.from_user.id,"Ничья!")
-            stateGame = 0
-        draw_board(bot,message,board)
-    elif message.text == "tt":
-        draw_board(bot,message,board)
-    elif "aa" in message.text:
-        take_input(bot,message,"X")
+        bot.send_message(message.from_user.id, "i am stupit")
+    elif message.text == "artem":
+        bot.send_message(chat_id=message.chat.id,
+                text="Here are the general tasks",
+                reply_markup=makeKeyboard(oButtonConfig),
+                parse_mode='HTML')	
     else:
-        stateGame = 0
         bot.send_message(message.from_user.id, "i undestend write /help.")
-def get_calendar(message):
-        now = datetime.datetime.now() #Текущая дата
-        chat_id = message.chat.id
-        date = (now.year,now.month)
-        current_shown_dates[chat_id] = date #Сохраним текущую дату в словарь
-        markup = create_calendar(now.year,now.month)
-        bot.send_message(message.chat.id, "Пожалйста, выберите дату", reply_markup=markup)
 
 bot.polling(none_stop=True, interval=0)	
